@@ -1,7 +1,7 @@
 <?php
 
 //连接数据库
-$conn = new mysqli("192.168.253.51","root","zhaokai123","a1809");
+$conn = new mysqli("127.0.0.1","root","admin123","a1809");
 $conn->set_charset("utf8");
 
 $server = new swoole_websocket_server('0.0.0.0',9502);
