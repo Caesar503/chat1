@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>聊天室</title>
+    <style>
+        .zai{
+            height: 400px;
+            width: 80px;
+            background-color: #2ea8e5;
+            float: right;
+            margin-right: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>您好，<font id="uname" color="#ff5500"></font>,欢迎进入聊天室！</h3>
+    <br><br><br><br>
+    <div id="hh"></div>
+    <br>
+    <input type="text" id="content"><input type="button" value="发送" id="send">
+</body>
+<script src="jquery-3.2.1.min.js"></script>
+<script>
+    $(function(){
+        var uname =prompt('请输入你的用户名','');
+        if(uname){
+            $('#uname').text(uname);
+        }
+
+        var web = new WebSocket("ws://6.20.com:9502");
+        web.onopen = function(){
+            //连接
+            if(uname){
+                web.send(uname);
+            }
+            //点击私聊
+            var sl= '';
+            var to = '';
+            $(document).on('click','#cli',function(){
+                sl = $(this).text();
+                $('#content').val('@'+sl+':');
+                to = $(this).attr('fd');
+            })
+            //发送消息
+            $('#send').on('click',function(){
+                var username = $('#uname').text();
+                if(!username){
+                    alert('用户名不能为空');
+                    return false;
+                }
+
+                var content = $('#content').val();
+                if(!content){
+                    alert('发送信息不能为空');
+                    return false;
+                }
+                var info='';
+                if(to){
+                    info = {'uname':username,'content':content,'to':to};
+                }else{
+                    info = {'uname':username,'content':content};
+                }
+                var aa = JSON.stringify(info);
+                web.send(aa);
+                $('#content').val('');
+                to ='';
+            })
+        };
+        web.onmessage = function(res){
+            var info = JSON.parse(res.data);
+            //随机字体颜色
+            function a (){
+                return '#'+Math.floor(Math.random()*16777215).toString(16);
+            }
+            var a =a();
+
+            if(!info.content){
+                $("#hh").append('<span style="color: '+a+';font-size: 23px;" fd='+info.fd+' id="cli">'+info.uname+'</span>:'+"已经上线！"+"<br>");
+            }else{
+                $("#hh").append('<span style="color: '+a+';font-size: 23px;" fd='+info.fd+' id="cli">'+info.uname+'</span>:'+info.content+"<br>");
+            }
+        }
+
+    })
+</script>
+</html>
