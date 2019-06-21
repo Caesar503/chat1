@@ -16,15 +16,11 @@ $server->on('message', function($server, $frame) use ($conn) {
 
     $arr = json_decode($frame->data,true);
     if(!$arr){
-        $sql = "insert into chat(uname,store_id)values('$frame->data','$store_id')";
-        $res = $conn->query($sql);
-        if($res) {
             foreach ($server->connections as $k) {
                 if($k!=$frame->fd){
                     $server->push($k, json_encode(['fd'=>$fd,'uname'=>$frame->data]));
                 }
             }
-        }
     }else{
         $uname = $arr['uname'];
         $content = $arr['content'];
